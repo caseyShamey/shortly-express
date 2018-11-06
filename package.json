@@ -20,14 +20,15 @@
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.3.4",
     "body-parser": "^1.15.0",
-    "bookshelf": "^0.9.1",
+    "bookshelf": "^0.13.3",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "express-partials": "^0.3.0",
     "express-session": "^1.13.0",
-    "knex": "^0.10.0",
+    "knex": "^0.15.2",
+    "nodemon": "^1.18.5",
     "request": "^2.34.0",
-    "sqlite3": "~3.1.1"
+    "sqlite3": "^4.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",

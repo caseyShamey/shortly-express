@@ -10,6 +10,8 @@ window.Shortly = Backbone.View.extend({
     console.log( 'Shortly is running' );
     $('body').append(this.render().el);
 
+    //check if user exists
+    //if not
     this.router = new Shortly.Router({ el: this.$el.find('#container') });
     this.router.on('route', this.updateNav, this);
 
