@@ -96,7 +96,7 @@ app.post('/login',
         req.session.regenerate(function() {
           req.session.user = username;
         });
-
+        //
         res.status(200).redirect('/');
       } else {
         res.status(400).redirect('/login');
