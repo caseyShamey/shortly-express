@@ -2,6 +2,8 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var connect = require('connect');
 
 
 var db = require('./app/config');
@@ -21,16 +23,41 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(connect());
+
+
+function restrict(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    req.session.error = 'Access denied!';
+    res.redirect('login');
+  }
+}
+
 
 
 app.get('/',
   function(req, res) {
-    res.render('login');
+    if (!req.session.user) {
+      res.redirect('login');
+    } else {
+      res.render('index');
+    }
   });
 
 app.get('/create',
   function(req, res) {
-    res.render('index');
+    if (!req.session.user) {
+      res.redirect('login');
+    } else {
+      res.render('index');
+    }
   });
 
 app.get('/signup',
@@ -50,8 +77,13 @@ app.post('/signup',
       password: password
     })
       .then(function(newUsers) {
-        res.status(200).render('login');
+        res.status(200).redirect('/');
       });
+  });
+
+app.get('/login',
+  function(req, res) {
+    res.render('login');
   });
 
 app.post('/login',
@@ -61,20 +93,38 @@ app.post('/login',
 
     new User({ username: username, password: password }).fetch().then(function(found) {
       if (found) {
-        res.status(200).render('index');
+        req.session.regenerate(function() {
+          req.session.user = username;
+        });
+
+        res.status(200).redirect('/');
       } else {
-        res.status(400).render('login');
+        res.status(400).redirect('/login');
       }
     });
   });
+
+app.get('/logout', function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/');
+  });
+});
+
+app.get('/index', restrict, function(req, res) {
+  res.send('This is the restricted area! Hello ' + request.session.user + '! click <a href="/logout">here to logout</a>');
+});
 
 
 
 app.get('/links',
   function(req, res) {
-    Links.reset().fetch().then(function(links) {
-      res.status(200).send(links.models);
-    });
+    if (!req.session.user) {
+      res.redirect('login');
+    } else {
+      Links.reset().fetch().then(function(links) {
+        res.status(200).send(links.models);
+      });
+    }
   });
 
 app.post('/links',
