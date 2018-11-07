@@ -40,24 +40,23 @@ function restrict(req, res, next) {
   }
 }
 
-
+var checkUser = (req, res) => {
+  if (!req.session.id) {
+    res.redirect('/login');
+  }
+};
 
 app.get('/',
   function(req, res) {
-    if (!req.session.user) {
-      res.redirect('login');
-    } else {
-      res.render('index');
-    }
+    console.log('req, res check', req, res);
+    checkUser(req, res);
+    res.render('index');
   });
 
 app.get('/create',
   function(req, res) {
-    if (!req.session.user) {
-      res.redirect('login');
-    } else {
-      res.render('index');
-    }
+    checkUser(req, res);
+    res.render('index');
   });
 
 app.get('/signup',
@@ -90,7 +89,6 @@ app.post('/login',
   function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
-
     new User({ username: username, password: password }).fetch().then(function(found) {
       if (found) {
         req.session.regenerate(function() {
@@ -105,8 +103,9 @@ app.post('/login',
   });
 
 app.get('/logout', function(req, res) {
+  req.session = null;
   req.session.destroy(function() {
-    res.redirect('/');
+    res.redirect('/login');
   });
 });
 
@@ -118,13 +117,11 @@ app.get('/index', restrict, function(req, res) {
 
 app.get('/links',
   function(req, res) {
-    if (!req.session.user) {
-      res.redirect('login');
-    } else {
-      Links.reset().fetch().then(function(links) {
-        res.status(200).send(links.models);
-      });
-    }
+    checkUser(req, res);
+    Links.reset().fetch().then(function(links) {
+      res.status(200).send(links.models);
+    });
+
   });
 
 app.post('/links',
@@ -191,5 +188,7 @@ app.get('/*', function(req, res) {
     }
   });
 });
+
+
 
 module.exports = app;

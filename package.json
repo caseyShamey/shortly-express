@@ -10,7 +10,7 @@
   },
   "scripts": {
     "postinstall": "curl -s https://raw.githubusercontent.com/reactorcore/pomander/master/bin/install | bash",
-    "start": "nodemon --ignore node_modules index.js",
+    "start": "nodemon --ignore node_modules --inspect index.js",
     "start:es6": "nodemon --exec babel-node --ignore node_modules index.js",
     "test": "mocha --bail --reporter nyan test/ServerSpec.js",
     "test:es6": "mocha --compilers js:babel-register --bail --reporter nyan test/ServerSpec.js",
